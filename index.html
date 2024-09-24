@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengukuran Box</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Pengukuran Box</h1>
+    <form id="boxForm">
+      <label for="panjang">Panjang:</label>
+      <input type="number" id="panjang" name="panjang" required>
+      
+      <label for="lebar">Lebar:</label>
+      <input type="number" id="lebar" name="lebar" required>
+      
+      <label for="tinggi">Tinggi:</label>
+      <input type="number" id="tinggi" name="tinggi" required>
+      
+      <button type="button" onclick="hitung()">Hitung</button>
+    </form>
+    
+    <div class="results">
+      <h2>Hasil Pengukuran</h2>
+      <p id="kelilingAlas">Keliling alas: </p>
+      <p id="ukuranAlas">Ukuran alas (ditambah 2, dikurang 0.5): </p>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
