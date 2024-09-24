@@ -8,13 +8,13 @@ function hitung() {
     }
     
     // Hitung keliling dari alas (2 * (panjang + lebar))
-    const kelilingAlas = 2 * (panjang + lebar);
+    const kelilingAlas = (2 * (panjang + lebar)) - 2 + 1;
     
     // Hitung ukuran panjang dan lebar alas ditambah 2 setiap sisi, dikurang 0.5
     const panjangAlas = panjang + 2 - 0.5;
     const lebarAlas = lebar + 2 - 0.5;
     
     // Tampilkan hasil
-    document.getElementById('kelilingAlas').textContent = `Keliling alas: ${kelilingAlas}`;
+    document.getElementById('kelilingAlas').textContent = `Keliling alas: (${kelilingAlas})`;
     document.getElementById('ukuranAlas').textContent = `Ukuran alas (Panjang: ${panjangAlas}, Lebar: ${lebarAlas})`;
   }
