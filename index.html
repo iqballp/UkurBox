@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generator CSV Cutting Layout</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       padding: 1rem;
@@ -13,42 +17,61 @@
       margin: auto;
       background: #f9f9f9;
     }
+
     h2 {
       margin-top: 2rem;
       font-size: 1.2rem;
       color: #333;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       overflow-x: auto;
       display: block;
     }
-    th, td {
+
+    th,
+    td {
       border: 1px solid #ccc;
       padding: 6px;
       text-align: center;
     }
-    input[type="number"], input[type="text"] {
+
+    input[type="number"],
+    input[type="text"] {
       width: 100%;
       padding: 4px;
       font-size: 0.9rem;
     }
+
     button {
       padding: 6px 12px;
       font-size: 0.9rem;
       cursor: pointer;
     }
+
     label {
       display: block;
       margin: 0.5rem 0 1rem;
     }
+
     @media (max-width: 600px) {
-      th, td { font-size: 0.8rem; padding: 4px; }
-      button { font-size: 0.8rem; padding: 4px 8px; }
+
+      th,
+      td {
+        font-size: 0.8rem;
+        padding: 4px;
+      }
+
+      button {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+      }
     }
   </style>
 </head>
+
 <body>
   <h2>Input Stok Bahan (S)</h2>
   <table id="stockTable">
@@ -62,7 +85,7 @@
 
   <h2>Input Ukuran Box</h2>
   <label>
-    Kelonggaran Lipatan (default 1.5): 
+    Kelonggaran Lipatan (default 1.5):
     <input type="number" id="allowance" step="0.1" value="1.5" />
   </label>
 
@@ -149,8 +172,14 @@
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      const monthName = monthNames[now.getMonth()];
+      const year = now.getFullYear();
+      const formatted = `${day}-${monthName}-${year}`;
       link.href = url;
-      link.download = 'cutting-from-box.csv';
+      link.download = `${formatted}.csv`;
       link.click();
     }
 
@@ -160,4 +189,5 @@
     };
   </script>
 </body>
+
 </html>
