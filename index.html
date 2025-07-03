@@ -1,34 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pengukuran Box</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generator CSV Cutting Layout</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      max-width: 900px;
+      margin: auto;
+      background: #f9f9f9;
+    }
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-x: auto;
+      display: block;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 4px;
+      font-size: 0.9rem;
+    }
+    button {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0 1rem;
+    }
+    @media (max-width: 600px) {
+      th, td { font-size: 0.8rem; padding: 4px; }
+      button { font-size: 0.8rem; padding: 4px 8px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Pengukuran Box</h1>
-    <form id="boxForm">
-      <label for="panjang">Panjang:</label>
-      <input type="number" id="panjang" name="panjang" required>
-      
-      <label for="lebar">Lebar:</label>
-      <input type="number" id="lebar" name="lebar" required>
-      
-      <label for="tinggi">Tinggi:</label>
-      <input type="number" id="tinggi" name="tinggi" required>
-      
-      <button type="button" onclick="hitung()">Hitung</button>
-    </form>
-    
-    <div class="results">
-      <h2>Hasil Pengukuran</h2>
-      <p id="kelilingAlas">Keliling alas box: (dikurang 2, ditambah 1) </p>
-      <p id="ukuranAlas">Ukuran alas box: (ditambah 2, dikurang 0.5) </p>
-    </div>
-  </div>
-  
-  <script src="script.js"></script>
+  <h2>Input Stok Bahan (S)</h2>
+  <table id="stockTable">
+    <tr>
+      <th>Length</th>
+      <th>Width</th>
+      <th>Quantity</th>
+      <th><button onclick="addRow('stockTable')">+</button></th>
+    </tr>
+  </table>
+
+  <h2>Input Ukuran Box</h2>
+  <label>
+    Kelonggaran Lipatan (default 1.5): 
+    <input type="number" id="allowance" step="0.1" value="1.5" />
+  </label>
+
+  <table id="boxTable">
+    <tr>
+      <th>Label Box</th>
+      <th>Panjang</th>
+      <th>Lebar</th>
+      <th>Tinggi</th>
+      <th>Jumlah</th>
+      <th><button onclick="addRow('boxTable')">+</button></th>
+    </tr>
+  </table>
+
+  <button onclick="generateCSV()">Download CSV</button>
+
+  <script>
+    function addRow(tableId) {
+      const table = document.getElementById(tableId);
+      const row = table.insertRow(-1);
+      const isBox = tableId === 'boxTable';
+      const colCount = isBox ? 5 : 3;
+      const defaultValues = isBox ? ["", "", "", "", "1"] : ["", "", "1"];
+
+      for (let i = 0; i < colCount; i++) {
+        const cell = row.insertCell();
+        const input = document.createElement("input");
+        input.type = i === 0 && isBox ? "text" : "number";
+        input.step = "any";
+        input.value = defaultValues[i];
+        cell.appendChild(input);
+      }
+
+      const deleteCell = row.insertCell();
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "−";
+      delBtn.onclick = () => table.deleteRow(row.rowIndex);
+      deleteCell.appendChild(delBtn);
+    }
+
+    function round2(x) {
+      return Math.round(x * 100) / 100;
+    }
+
+    function generateCSV() {
+      let csv = '';
+
+      // Stok
+      csv += '@,Length,Width,Quantity\n';
+      const stockTable = document.getElementById('stockTable');
+      for (let i = 1; i < stockTable.rows.length; i++) {
+        const cells = stockTable.rows[i].cells;
+        const values = Array.from(cells).slice(0, 3).map(td => td.firstChild.value);
+        csv += 'S,' + values.join(',') + '\n';
+      }
+
+      // Panel dari box
+      csv += '\n@,Length,Width,Quantity,Grain direction,Label\n';
+      const boxTable = document.getElementById('boxTable');
+      const allowance = parseFloat(document.getElementById('allowance').value) || 1.5;
+
+      for (let i = 1; i < boxTable.rows.length; i++) {
+        const cells = boxTable.rows[i].cells;
+        const label = cells[0].firstChild.value || `box_${i}`;
+        const P = parseFloat(cells[1].firstChild.value) || 0;
+        const L = parseFloat(cells[2].firstChild.value) || 0;
+        const T = parseFloat(cells[3].firstChild.value) || 0;
+        const Q = parseInt(cells[4].firstChild.value) || 1;
+
+        if (P && L && T && Q) {
+          // Panel bawah: (2 × (P + L)) - 2 + 1
+          const bawahW = round2(2 * (P + L) - 1);
+          const bawahH = round2(T);
+          csv += `P,${bawahW},${bawahH},${Q},,panel_bawah_${label}\n`;
+
+          // Panel atas
+          const atasW = round2(P + allowance);
+          const atasH = round2(L + allowance);
+          csv += `P,${atasW},${atasH},${Q},,panel_atas_${label}\n`;
+        }
+      }
+
+      // Download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'cutting-from-box.csv';
+      link.click();
+    }
+
+    window.onload = () => {
+      addRow('stockTable');
+      addRow('boxTable');
+    };
+  </script>
 </body>
 </html>
