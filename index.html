@@ -207,12 +207,12 @@
           // Panel bawah: (2 × (P + L)) - 2 + 1
           const bawahW = round2(2 * (P + L) - 1);
           const bawahH = round2(T);
-          csv += `P,${bawahW},${bawahH},${Q},,panel_bawah_${label}\n`;
+          csv += `P,${bawahW},${bawahH},${Q},,${label}\n`;
 
           // Panel atas
           const atasW = round2(P + allowance);
           const atasH = round2(L + allowance);
-          csv += `P,${atasW},${atasH},${Q},,panel_atas_${label}\n`;
+          csv += `P,${atasW},${atasH},${Q},,${label}\n`;
         }
       }
 
