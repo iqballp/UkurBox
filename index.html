@@ -103,6 +103,8 @@
   <button onclick="generateCSV()">Download CSV</button>
 
   <script>
+    let globalTabIndex = 1; // biar tabindex urut untuk semua input
+
     function addRow(tableId) {
       const table = document.getElementById(tableId);
       const row = table.insertRow(-1);
@@ -115,15 +117,61 @@
         const input = document.createElement("input");
         input.type = i === 0 && isBox ? "text" : "number";
         input.step = "any";
-        input.value = defaultValues[i];
+        input.style.width = "100%";
+        input.tabIndex = globalTabIndex++;
+
+        // Auto-value dari baris sebelumnya
+        if (isBox && table.rows.length > 2) {
+          const prevRow = table.rows[table.rows.length - 2].cells;
+          if (i === 0) {
+            const prevLabel = prevRow[0].firstChild.value.trim();
+            const match = prevLabel.match(/^([A-Za-z]+)(\d+)?$/);
+            if (match) {
+              const prefix = match[1];
+              const num = parseInt(match[2]) || 0;
+              input.value = prefix + (num + 1);
+            }
+          } else if (i === 3) {
+            const prevTinggi = parseFloat(prevRow[3].firstChild.value);
+            input.value = isNaN(prevTinggi) ? "" : prevTinggi + 5;
+          } else if (i === 4) {
+            input.value = "1";
+          } else {
+            input.value = "";
+          }
+        } else {
+          input.value = defaultValues[i];
+        }
+
+        // Keyboard shortcut: dari kolom "Lebar" langsung lompat ke "Panjang" baris bawah
+        if (isBox && i === 2) {
+          input.addEventListener("keydown", function (e) {
+            if ((e.key === "Tab" || e.keyCode === 9) && !e.shiftKey) {
+              e.preventDefault();
+              const nextRow = row.rowIndex;
+              const nextInput = table.rows[nextRow] && table.rows[nextRow].cells[1]?.firstChild;
+              if (nextInput) nextInput.focus();
+            }
+          });
+        }
+
         cell.appendChild(input);
       }
 
+      // Tombol hapus
       const deleteCell = row.insertCell();
       const delBtn = document.createElement("button");
       delBtn.textContent = "−";
       delBtn.onclick = () => table.deleteRow(row.rowIndex);
       deleteCell.appendChild(delBtn);
+
+      // ⏱ Fokus langsung ke kolom "Panjang" saat baris baru ditambah
+      if (isBox) {
+        setTimeout(() => {
+          const newRow = table.rows[table.rows.length - 1];
+          newRow.cells[1].firstChild.focus(); // Kolom "Panjang"
+        }, 10);
+      }
     }
 
     function round2(x) {
