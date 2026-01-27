@@ -2,240 +2,384 @@
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generator CSV Cutting Layout</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Potongan Box & CSV</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: Arial, sans-serif;
-      padding: 1rem;
-      max-width: 900px;
-      margin: auto;
-      background: #f9f9f9;
-    }
-
-    h2 {
-      margin-top: 2rem;
-      font-size: 1.2rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f0f2f5;
       color: #333;
     }
 
+    h2,
+    h3 {
+      color: #2c3e50;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    /* Container Styles */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .full-width {
+      width: 100%;
+      flex: 100%;
+    }
+
+    /* Form Elements */
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Buttons */
+    .btn-add {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .btn-add:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-csv {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .btn-csv:hover {
+      background-color: #218838;
+    }
+
+    .btn-goto {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .btn-goto:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    /* Table */
     table {
       width: 100%;
       border-collapse: collapse;
-      overflow-x: auto;
-      display: block;
+      margin-top: 15px;
+      background: white;
     }
 
     th,
     td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 0.9em;
     }
 
-    input[type="number"],
-    input[type="text"] {
-      width: 100%;
-      padding: 4px;
-      font-size: 0.9rem;
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
     }
 
-    button {
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      cursor: pointer;
+    /* Helpers */
+    .hint {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 2px;
     }
 
-    label {
-      display: block;
-      margin: 0.5rem 0 1rem;
-    }
-
-    @media (max-width: 600px) {
-
-      th,
-      td {
-        font-size: 0.8rem;
-        padding: 4px;
-      }
-
-      button {
-        font-size: 0.8rem;
-        padding: 4px 8px;
-      }
+    .badge {
+      background: #e2e6ea;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8em;
     }
   </style>
 </head>
 
 <body>
-  <h2>Input Stok Bahan (S)</h2>
-  <table id="stockTable">
-    <tr>
-      <th>Length</th>
-      <th>Width</th>
-      <th>Quantity</th>
-      <th><button onclick="addRow('stockTable')">+</button></th>
-    </tr>
-  </table>
 
-  <h2>Input Ukuran Box</h2>
-  <label>
-    Kelonggaran Lipatan (default 1.5):
-    <input type="number" id="allowance" step="0.1" value="1.5" />
-  </label>
+  <h2 style="text-align: center;">Generator Potongan Box & Export CSV</h2>
 
-  <table id="boxTable">
-    <tr>
-      <th>Label Box</th>
-      <th>Panjang</th>
-      <th>Lebar</th>
-      <th>Tinggi</th>
-      <th>Jumlah</th>
-      <th><button onclick="addRow('boxTable')">+</button></th>
-    </tr>
-  </table>
+  <div class="card full-width">
+    <h3>1. Data Stok Bahan (Lembaran)</h3>
+    <div style="display: flex; gap: 10px;">
+      <div style="flex:1">
+        <label>Panjang Stok:</label>
+        <input type="number" id="stokP" placeholder="misal: 139.5">
+      </div>
+      <div style="flex:1">
+        <label>Lebar Stok:</label>
+        <input type="number" id="stokL" placeholder="misal: 50">
+      </div>
+      <div style="flex:1">
+        <label>Qty Stok:</label>
+        <input type="number" id="stokQ" placeholder="misal: 10" value="1">
+      </div>
+    </div>
+  </div>
 
-  <button onclick="generateCSV()">Download CSV</button>
+  <div class="container" style="margin-top: 20px;">
+
+    <div class="card">
+      <h3>2. Input Ukuran Box</h3>
+
+      <label>Nama Label Box:</label>
+      <input type="text" id="labelBox" placeholder="Contoh: DompetHytam">
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex:1">
+          <label>Panjang (P):</label>
+          <input type="number" id="inputP" step="0.1">
+        </div>
+        <div style="flex:1">
+          <label>Lebar (L):</label>
+          <input type="number" id="inputL" step="0.1">
+        </div>
+        <div style="flex:1">
+          <label>Tinggi (T):</label>
+          <input type="number" id="inputT" step="0.1">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex:1">
+          <label>Jumlah Box:</label>
+          <input type="number" id="inputQty" value="1">
+        </div>
+        <div style="flex:1">
+          <label>Double Tape (1 Sisi):</label>
+          <input type="number" id="inputTape" value="0.7" step="0.1">
+          <div class="hint">Gap total otomatis dikali 2</div>
+        </div>
+      </div>
+
+      <button class="btn-add" onclick="tambahData()">+ Tambah ke Daftar</button>
+    </div>
+
+    <div class="card full-width">
+      <h3>3. Daftar Antrian Potong</h3>
+      <table id="tabelData">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Ukuran (PxLxT)</th>
+            <th>Tape (1 sisi)</th>
+            <th>Qty Box</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+      <div style="text-align: right; margin-top: 10px; color: #666; font-size: 0.9em;">
+        Total Box: <span id="totalBoxCount">0</span>
+      </div>
+
+      <button class="btn-csv" onclick="downloadCSV()">Unduh CSV</button>
+
+      <h4 style="text-align: center;">Dibuat dari Gemini AI 3 Pro</h4>
+      <h6 style="text-align: center;">Patch 27 Januari 2026</h6>
+    </div>
+    <a style="text-decoration: none;" href="https://www.opticutter.com/cut-list-optimizer/import/csv" target="_blank"
+      class="btn-goto">Buka Opticutter</a>
+  </div>
 
   <script>
-    let globalTabIndex = 1; // biar tabindex urut untuk semua input
+    let daftarBox = [];
 
-    function addRow(tableId) {
-      const table = document.getElementById(tableId);
-      const row = table.insertRow(-1);
-      const isBox = tableId === 'boxTable';
-      const colCount = isBox ? 5 : 3;
-      const defaultValues = isBox ? ["", "", "", "", "1"] : ["", "", "1"];
+    function tambahData() {
+      // Ambil value
+      let label = document.getElementById('labelBox').value || "NoLabel";
+      let p = parseFloat(document.getElementById('inputP').value);
+      let l = parseFloat(document.getElementById('inputL').value);
+      let t = parseFloat(document.getElementById('inputT').value);
+      let qty = parseInt(document.getElementById('inputQty').value);
+      let tape = parseFloat(document.getElementById('inputTape').value);
 
-      for (let i = 0; i < colCount; i++) {
-        const cell = row.insertCell();
-        const input = document.createElement("input");
-        input.type = i === 0 && isBox ? "text" : "number";
-        input.step = "any";
-        input.style.width = "100%";
-        input.tabIndex = globalTabIndex++;
-
-        // Auto-value dari baris sebelumnya
-        if (isBox && table.rows.length > 2) {
-          const prevRow = table.rows[table.rows.length - 2].cells;
-          if (i === 0) {
-            const prevLabel = prevRow[0].firstChild.value.trim();
-            const match = prevLabel.match(/^([A-Za-z]+)(\d+)?$/);
-            if (match) {
-              const prefix = match[1];
-              const num = parseInt(match[2]) || 0;
-              input.value = prefix + (num + 1);
-            }
-          } else if (i === 3) {
-            const prevTinggi = parseFloat(prevRow[3].firstChild.value);
-            input.value = isNaN(prevTinggi) ? "" : prevTinggi + 5;
-          } else if (i === 4) {
-            input.value = "1";
-          } else {
-            input.value = "";
-          }
-        } else {
-          input.value = defaultValues[i];
-        }
-
-        // Keyboard shortcut: dari kolom "Lebar" langsung lompat ke "Panjang" baris bawah
-        if (isBox && i === 2) {
-          input.addEventListener("keydown", function (e) {
-            if ((e.key === "Tab" || e.keyCode === 9) && !e.shiftKey) {
-              e.preventDefault();
-              const nextRow = row.rowIndex;
-              const nextInput = table.rows[nextRow] && table.rows[nextRow].cells[1]?.firstChild;
-              if (nextInput) nextInput.focus();
-            }
-          });
-        }
-
-        cell.appendChild(input);
+      // Validasi
+      if (isNaN(p) || isNaN(l) || isNaN(t) || isNaN(qty)) {
+        alert("Harap isi Panjang, Lebar, Tinggi, dan Jumlah dengan benar.");
+        return;
       }
 
-      // Tombol hapus
-      const deleteCell = row.insertCell();
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "−";
-      delBtn.onclick = () => table.deleteRow(row.rowIndex);
-      deleteCell.appendChild(delBtn);
+      // Masukkan ke array object
+      let dataBaru = {
+        id: Date.now(), // ID unik untuk hapus
+        label: label,
+        p: p,
+        l: l,
+        t: t,
+        qty: qty,
+        tape: tape
+      };
 
-      // ⏱ Fokus langsung ke kolom "Panjang" saat baris baru ditambah
-      if (isBox) {
-        setTimeout(() => {
-          const newRow = table.rows[table.rows.length - 1];
-          newRow.cells[1].firstChild.focus(); // Kolom "Panjang"
-        }, 10);
-      }
+      daftarBox.push(dataBaru);
+      renderTabel();
+
+      // Reset form kecil (biar enak input selanjutnya)
+      document.getElementById('labelBox').value = "";
+      document.getElementById('inputP').value = "";
+      document.getElementById('inputL').value = "";
+      document.getElementById('inputT').value = "";
+      document.getElementById('inputBox').focus();
     }
 
-    function round2(x) {
-      return Math.round(x * 100) / 100;
+    function hapusData(id) {
+      daftarBox = daftarBox.filter(item => item.id !== id);
+      renderTabel();
     }
 
-    function generateCSV() {
-      let csv = '';
+    function renderTabel() {
+      let tbody = document.querySelector("#tabelData tbody");
+      tbody.innerHTML = "";
 
-      // Stok
-      csv += '@,Length,Width,Quantity\n';
-      const stockTable = document.getElementById('stockTable');
-      for (let i = 1; i < stockTable.rows.length; i++) {
-        const cells = stockTable.rows[i].cells;
-        const values = Array.from(cells).slice(0, 3).map(td => td.firstChild.value);
-        csv += 'S,' + values.join(',') + '\n';
+      let totalQty = 0;
+
+      daftarBox.forEach((item, index) => {
+        totalQty += item.qty;
+        let row = `
+                <tr>
+                    <td>${item.label}</td>
+                    <td>${item.p} x ${item.l} x ${item.t}</td>
+                    <td>${item.tape}</td>
+                    <td>${item.qty}</td>
+                    <td><button class="btn-delete" onclick="hapusData(${item.id})">Hapus</button></td>
+                </tr>
+            `;
+        tbody.innerHTML += row;
+      });
+
+      document.getElementById('totalBoxCount').innerText = totalQty;
+    }
+
+    // Fungsi Format Angka (menghilangkan koma aneh floating point)
+    function fmt(num) {
+      return parseFloat(num.toFixed(2)); // Maksimal 2 desimal
+    }
+
+    function downloadCSV() {
+      if (daftarBox.length === 0) {
+        alert("Belum ada data box yang diinput!");
+        return;
       }
 
-      // Panel dari box
-      csv += '\n@,Length,Width,Quantity,Grain direction,Label\n';
-      const boxTable = document.getElementById('boxTable');
-      const allowance = parseFloat(document.getElementById('allowance').value) || 1.5;
+      // 1. Ambil Data Stok
+      let sP = document.getElementById('stokP').value || 0;
+      let sL = document.getElementById('stokL').value || 0;
+      let sQ = document.getElementById('stokQ').value || 0;
 
-      for (let i = 1; i < boxTable.rows.length; i++) {
-        const cells = boxTable.rows[i].cells;
-        const label = cells[0].firstChild.value || `box_${i}`;
-        const P = parseFloat(cells[1].firstChild.value) || 0;
-        const L = parseFloat(cells[2].firstChild.value) || 0;
-        const T = parseFloat(cells[3].firstChild.value) || 0;
-        const Q = parseInt(cells[4].firstChild.value) || 1;
+      // 2. Buat Header CSV
+      // Format: @,Length,Width,Quantity (Untuk Stok)
+      let csvContent = "data:text/csv;charset=utf-8,";
 
-        if (P && L && T && Q) {
-          // Panel bawah: (2 × (P + L)) - 2 + 1
-          const bawahW = round2(2 * (P + L) - 1);
-          const bawahH = round2(T);
-          csv += `P,${bawahW},${bawahH},${Q},,${label}\n`;
+      // HEADER STOK
+      csvContent += "@,Length,Width,Quantity\n";
+      csvContent += `S,${sP},${sL},${sQ}\n`; // Baris Stok
+      csvContent += "\n"; // Baris kosong pemisah (sesuai request)
 
-          // Panel atas
-          const atasW = round2(P + allowance);
-          const atasH = round2(L + allowance);
-          csv += `P,${atasW},${atasH},${Q},,${label}\n`;
-        }
-      }
+      // HEADER POTONGAN
+      // Format: @,Length,Width,Quantity,Grain direction,Label
+      csvContent += "@,Length,Width,Quantity,Grain direction,Label\n";
 
-      // Download
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-      const monthName = monthNames[now.getMonth()];
-      const year = now.getFullYear();
-      const formatted = `${day}-${monthName}-${year}`;
-      link.href = url;
-      link.download = `${formatted}.csv`;
+      // 3. Loop Kalkulasi Potongan
+      daftarBox.forEach(box => {
+        let gapTotal = box.tape * 2; // Tape 1 sisi dikali 2
+
+        // Rumus 1: (P + 2L + Gap) x T -> Label +a
+        let p1_dim1 = fmt(box.p + (2 * box.l) + gapTotal);
+        let p1_dim2 = fmt(box.t);
+        let row1 = `P,${p1_dim1},${p1_dim2},${box.qty},,${box.label}+a`;
+
+        // Rumus 2: P x T -> Label +b
+        let p2_dim1 = fmt(box.p);
+        let p2_dim2 = fmt(box.t);
+        let row2 = `P,${p2_dim1},${p2_dim2},${box.qty},,${box.label}+b`;
+
+        // Rumus 3: (P + Gap) x (L + Gap) -> Label +atas
+        let p3_dim1 = fmt(box.p + gapTotal);
+        let p3_dim2 = fmt(box.l + gapTotal);
+        let row3 = `P,${p3_dim1},${p3_dim2},${box.qty},,${box.label}+atas`;
+
+        // Gabungkan ke CSV
+        csvContent += row1 + "\n";
+        csvContent += row2 + "\n";
+        csvContent += row3 + "\n";
+      });
+
+      // 4. Trigger Download
+      let encodedUri = encodeURI(csvContent);
+      let link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "data_potong_box.csv");
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
-
-    window.onload = () => {
-      addRow('stockTable');
-      addRow('boxTable');
-    };
   </script>
+
 </body>
 
 </html>
