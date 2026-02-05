@@ -241,7 +241,7 @@
       <button class="btn-csv" onclick="downloadCSV()">Unduh CSV</button>
 
       <h4 style="text-align: center;">Dibuat dari Gemini AI 3 Pro</h4>
-      <h6 style="text-align: center;">Patch 27 Januari 2026</h6>
+      <h6 style="text-align: center;">Versi 06 Februari 26</h6>
     </div>
     <a style="text-decoration: none;" href="https://www.opticutter.com/cut-list-optimizer/import/csv" target="_blank"
       class="btn-goto">Buka Opticutter</a>
@@ -256,6 +256,8 @@
       let p = parseFloat(document.getElementById('inputP').value);
       let l = parseFloat(document.getElementById('inputL').value);
       let t = parseFloat(document.getElementById('inputT').value);
+      p = p - 0.5;
+      l = l - 0.5;
       let qty = parseInt(document.getElementById('inputQty').value);
       let tape = parseFloat(document.getElementById('inputTape').value);
 
